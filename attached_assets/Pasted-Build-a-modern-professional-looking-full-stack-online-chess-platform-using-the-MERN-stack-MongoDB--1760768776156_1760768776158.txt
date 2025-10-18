@@ -1,0 +1,126 @@
+Build a modern, professional-looking full-stack online chess platform using the MERN stack (MongoDB, Express, React, Node.js) with Socket.io for real-time multiplayer and Stockfish.js for AI chess moves.
+
+🧩 Project Overview:
+
+The app should allow users to:
+
+Sign Up / Log In using JWT authentication.
+
+Choose a game mode after logging in:
+
+♟️ Play vs Computer (AI mode)
+
+👥 Play vs Human (Online Multiplayer)
+
+🤝 Friendly Match (via Game Code)
+
+Play Chess on a visually stunning board with smooth animations and live move tracking.
+
+⚙️ Core Functionality:
+
+Use chess.js for move validation and game logic.
+
+Use stockfish.js for AI moves in "vs Computer" mode.
+
+Use Socket.io for online multiplayer:
+
+Player A creates a room.
+
+Player B joins via room code or matchmaking.
+
+Moves sync in real-time between both players.
+
+Store users, matches, and history in MongoDB.
+
+Use Express for REST APIs and WebSocket management.
+
+Protect all routes with JWT.
+
+🎨 Frontend Requirements (React + Tailwind):
+
+Use React + Tailwind CSS for UI.
+
+Use Framer Motion for smooth transitions and hover animations.
+
+Include a beautiful dashboard after login showing:
+
+Username, profile picture, and stats (wins/losses).
+
+Match history with date, opponent, and result.
+
+Game Page UI:
+
+Chessboard in center (using chessboardjsx or similar).
+
+Right-side panel for move list, game timer, and resign/draw buttons.
+
+Chat panel below (Socket.io-based).
+
+Elegant dark theme with subtle gradients and neon accents (like #0f172a background and #14b8a6 highlights).
+
+🧠 Backend Structure:
+
+/api/auth/ → login, signup, profile routes
+
+/api/game/ → createGame, joinGame, saveResult
+
+/socket/ → handle move events, player join/leave, game code logic
+
+Game schema example:
+
+{
+  player1: String,
+  player2: String,
+  mode: "AI" | "Online" | "Friendly",
+  result: String,
+  moves: [String],
+  createdAt: Date
+}
+
+🌐 Additional Features:
+
+Responsive and mobile-friendly layout.
+
+“Play Again” and “Share Game” buttons at the end.
+
+Game replay viewer.
+
+Optional difficulty selection for AI mode.
+
+Toast notifications for moves, wins, or disconnects.
+
+🧱 Folder Structure Example:
+chess-platform/
+├── backend/
+│   ├── server.js
+│   ├── routes/
+│   ├── controllers/
+│   ├── models/
+│   └── sockets/
+├── frontend/
+│   ├── src/
+│   │   ├── components/
+│   │   ├── pages/
+│   │   ├── context/
+│   │   ├── App.js
+│   │   └── index.js
+└── README.md
+
+🚀 Tech Stack Summary:
+
+Frontend: React, Tailwind, Framer Motion, chessboardjsx
+
+Backend: Node.js, Express, Socket.io
+
+Database: MongoDB + Mongoose
+
+AI Engine: Stockfish.js
+
+Auth: JWT
+
+Deployment: Vercel (frontend), Render / Railway (backend), MongoDB Atlas
+
+🧑‍💼 Goal:
+
+The final result should look like a premium SaaS-level chess platform, visually clean, highly interactive, and responsive — something that could impress recruiters or be showcased in a developer portfolio.
+Focus on beautiful UI, modern animations, structured code, and scalable architecture.
