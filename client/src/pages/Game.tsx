@@ -229,6 +229,13 @@ export default function Game() {
     return gameData.player1?.username || "Waiting...";
   };
 
+  const isMyTurn = () => {
+    if (!gameData || gameData.status !== "active") return false;
+    if (gameData.mode === "ai") return game.turn() === "w";
+    if (playerColor === "white") return game.turn() === "w";
+    return game.turn() === "b";
+  };
+
   useEffect(() => {
     if (!currentGameId && mode === "online" && !createGameMutation.isPending) {
       createGameMutation.mutate({ mode: "online" });
@@ -331,14 +338,20 @@ export default function Game() {
                     </Avatar>
                     <div>
                       <div className="font-medium">{getOpponentName()}</div>
-                      <div className="text-sm text-muted-foreground">
-                        {gameData?.mode === "ai" ? "Computer" : "Online Player"}
+                      <div className="text-sm text-muted-foreground flex items-center gap-1">
+                        <span className={`w-2 h-2 rounded-full inline-block ${playerColor === "white" ? "bg-gray-800 border border-gray-400" : "bg-white border border-gray-400"}`} />
+                        {playerColor === "white" ? "Black" : "White"}
                       </div>
                     </div>
                   </div>
-                  {gameData?.status === "finished" && gameData.winnerId !== currentUserId && (
-                    <Badge variant="destructive">Winner</Badge>
-                  )}
+                  <div className="flex items-center gap-2">
+                    {!isMyTurn() && gameData?.status === "active" && (
+                      <Badge className="bg-primary text-primary-foreground animate-pulse">Thinking...</Badge>
+                    )}
+                    {gameData?.status === "finished" && gameData.winnerId !== currentUserId && gameData.winnerId && (
+                      <Badge variant="destructive">Winner</Badge>
+                    )}
+                  </div>
                 </div>
               </CardContent>
             </Card>
@@ -348,7 +361,7 @@ export default function Game() {
                 <Chessboard
                   game={game}
                   onMove={handleMove}
-                  disabled={gameData?.status === "finished" || gameLoading}
+                  disabled={gameData?.status === "finished" || gameLoading || !isMyTurn()}
                   orientation={playerColor}
                   data-testid="chessboard"
                 />
@@ -366,12 +379,20 @@ export default function Game() {
                     </Avatar>
                     <div>
                       <div className="font-medium">{currentUsername}</div>
-                      <div className="text-sm text-muted-foreground">You</div>
+                      <div className="text-sm text-muted-foreground flex items-center gap-1">
+                        <span className={`w-2 h-2 rounded-full inline-block ${playerColor === "white" ? "bg-white border border-gray-400" : "bg-gray-800 border border-gray-400"}`} />
+                        {playerColor === "white" ? "White" : "Black"}
+                      </div>
                     </div>
                   </div>
-                  {gameData?.status === "finished" && gameData.winnerId === currentUserId && (
-                    <Badge className="bg-chart-2 text-chart-2-foreground">Winner</Badge>
-                  )}
+                  <div className="flex items-center gap-2">
+                    {isMyTurn() && gameData?.status === "active" && (
+                      <Badge className="bg-chart-2 text-white animate-pulse">Your turn</Badge>
+                    )}
+                    {gameData?.status === "finished" && gameData.winnerId === currentUserId && (
+                      <Badge className="bg-chart-2 text-chart-2-foreground">Winner</Badge>
+                    )}
+                  </div>
                 </div>
               </CardContent>
             </Card>

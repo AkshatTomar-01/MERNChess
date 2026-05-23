@@ -18,10 +18,12 @@ export default function Dashboard() {
 
   const { data: profile, isLoading: profileLoading } = useQuery<UserProfile>({
     queryKey: ["/api/auth/profile"],
+    staleTime: 0,
   });
 
   const { data: recentGames, isLoading: gamesLoading } = useQuery<GameWithPlayers[]>({
     queryKey: ["/api/game/recent"],
+    staleTime: 0,
   });
 
   const handleLogout = () => {
