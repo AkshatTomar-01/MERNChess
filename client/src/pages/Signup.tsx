@@ -9,7 +9,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
-import { apiRequest } from "@/lib/queryClient";
+import { apiRequest, queryClient } from "@/lib/queryClient";
 import { setToken } from "@/lib/auth";
 import { Crown, Loader2 } from "lucide-react";
 
@@ -43,6 +43,7 @@ export default function Signup() {
     },
     onSuccess: (data: { token: string }) => {
       setToken(data.token);
+      queryClient.clear();
       toast({
         title: "Account created!",
         description: "Welcome to ChessMaster. Let's start playing!",
