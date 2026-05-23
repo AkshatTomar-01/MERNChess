@@ -19,7 +19,6 @@ interface AuthRequest extends express.Request {
   userId?: string;
 }
 
-// Middleware to verify JWT token
 const authMiddleware = async (
   req: AuthRequest,
   res: express.Response,
@@ -40,21 +39,17 @@ const authMiddleware = async (
   }
 };
 
-// WebSocket connections map
 const gameConnections = new Map<string, Set<WebSocket>>();
 
-// Intelligent chess AI with difficulty levels
 async function getAIMove(fen: string, difficulty: string): Promise<{ from: string; to: string; promotion?: string } | null> {
   const game = new Chess(fen);
   const moves = game.moves({ verbose: true });
   
   if (moves.length === 0) return null;
 
-  // Score moves based on various factors
   const scoredMoves = moves.map(move => {
     let score = 0;
     
-    // Capture values
     const pieceValues: Record<string, number> = {
       'p': 1, 'n': 3, 'b': 3, 'r': 5, 'q': 9, 'k': 0
     };
@@ -62,33 +57,21 @@ async function getAIMove(fen: string, difficulty: string): Promise<{ from: strin
     if (move.captured) {
       score += pieceValues[move.captured] * 10;
     }
-    
-    // Check bonus
     if (move.san.includes('+')) {
       score += 5;
     }
-    
-    // Checkmate
     if (move.san.includes('#')) {
       score += 1000;
     }
-    
-    // Center control (e4, e5, d4, d5)
     if (['e4', 'e5', 'd4', 'd5'].includes(move.to)) {
       score += 2;
     }
-    
-    // Promotion
     if (move.flags.includes('p')) {
       score += 8;
     }
-    
-    // Castling
     if (move.flags.includes('k') || move.flags.includes('q')) {
       score += 3;
     }
-    
-    // Development (knight and bishop moves in opening)
     const moveCount = game.history().length;
     if ((move.piece === 'n' || move.piece === 'b') && moveCount < 20) {
       score += 1;
@@ -97,42 +80,36 @@ async function getAIMove(fen: string, difficulty: string): Promise<{ from: strin
     return { move, score };
   });
 
-  // Sort by score descending
   scoredMoves.sort((a, b) => b.score - a.score);
 
   let selectedMove;
   
   if (difficulty === "easy") {
-    // Pick from bottom 40% of moves (weaker moves)
     const weakMoves = scoredMoves.slice(Math.floor(scoredMoves.length * 0.6));
     selectedMove = weakMoves.length > 0 
       ? weakMoves[Math.floor(Math.random() * weakMoves.length)].move
       : scoredMoves[scoredMoves.length - 1].move;
   } else if (difficulty === "medium") {
-    // Pick from top 60% of moves with some randomness
     const goodMoves = scoredMoves.slice(0, Math.ceil(scoredMoves.length * 0.6));
     selectedMove = goodMoves[Math.floor(Math.random() * goodMoves.length)].move;
   } else {
-    // Hard: Pick from top 30% of moves
     const bestMoves = scoredMoves.slice(0, Math.max(1, Math.ceil(scoredMoves.length * 0.3)));
     selectedMove = bestMoves[Math.floor(Math.random() * bestMoves.length)].move;
   }
   
-  // Check if this is a promotion move and add promotion piece
   const result: { from: string; to: string; promotion?: string } = { 
     from: selectedMove.from, 
     to: selectedMove.to 
   };
   
   if (selectedMove.flags.includes('p')) {
-    result.promotion = 'q'; // Always promote to queen
+    result.promotion = 'q';
   }
   
   return result;
 }
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  // Auth routes
   app.post("/api/auth/signup", async (req, res) => {
     try {
       const { username, password } = insertUserSchema.parse(req.body);
@@ -185,12 +162,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Game routes
   app.post("/api/game/create", authMiddleware, async (req: AuthRequest, res) => {
     try {
       const { mode, difficulty, gameCode } = req.body;
       
-      // Online matchmaking - try to find a waiting game first
       if (mode === "online") {
         const waitingGame = await storage.findWaitingOnlineGame(req.userId!);
         if (waitingGame) {
@@ -199,7 +174,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
 
-      // Friendly match - join existing game by code
       let code = gameCode;
       if (mode === "friendly" && !code) {
         code = nanoid(6).toUpperCase();
@@ -216,7 +190,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
 
-      // Create new game (online waiting, AI active, or friendly waiting)
       const game = await storage.createGame({
         player1Id: req.userId!,
         mode,
@@ -261,7 +234,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       await storage.updateGameFen(gameId, chess.fen(), chess.pgn());
 
-      // Check for game over
       if (chess.isGameOver()) {
         let result = "draw";
         let winnerId: string | undefined;
@@ -273,7 +245,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
         await storage.finishGame(gameId, result, winnerId);
 
-        // Update user stats
         if (winnerId) {
           const winner = await storage.getUser(winnerId);
           const loser = await storage.getUser(winnerId === game.player1Id ? game.player2Id! : game.player1Id);
@@ -312,7 +283,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
           }
           await storage.updateGameFen(gameId, chess.fen(), chess.pgn());
 
-          // Check again for AI checkmate
           if (chess.isGameOver()) {
             let result = "draw";
             let winnerId: string | undefined;
@@ -357,7 +327,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       await storage.finishGame(gameId, result, winnerId || undefined);
 
-      // Update stats
       if (winnerId) {
         const winner = await storage.getUser(winnerId);
         if (winner) await storage.updateUserStats(winnerId, winner.wins + 1, winner.losses, winner.draws);
@@ -390,7 +359,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Chat routes
   app.post("/api/game/chat", authMiddleware, async (req: AuthRequest, res) => {
     try {
       const { gameId, message } = req.body;
@@ -401,7 +369,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
         message,
       });
 
-      // Broadcast to WebSocket clients
       const connections = gameConnections.get(gameId);
       if (connections) {
         const user = await storage.getUserProfile(req.userId!);
@@ -429,10 +396,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Create HTTP server
   const httpServer = createServer(app);
 
-  // WebSocket server for real-time features
   const wss = new WebSocketServer({ server: httpServer, path: '/ws' });
 
   wss.on("connection", (ws: WebSocket) => {
@@ -450,8 +415,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
           }
           gameConnections.get(currentGameId)!.add(ws);
         }
-
-        if (message.type === "move" && currentGameId) {
           const connections = gameConnections.get(currentGameId);
           if (connections) {
             connections.forEach((clientWs) => {

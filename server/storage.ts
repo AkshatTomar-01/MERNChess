@@ -16,14 +16,12 @@ import { db } from "./db";
 import { eq, desc, or, and, sql } from "drizzle-orm";
 
 export interface IStorage {
-  // User methods
   getUser(id: string): Promise<User | undefined>;
   getUserByUsername(username: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
   getUserProfile(id: string): Promise<UserProfile | undefined>;
   updateUserStats(id: string, wins: number, losses: number, draws: number): Promise<void>;
   
-  // Game methods
   createGame(game: Partial<InsertGame> & { player1Id: string }): Promise<Game>;
   getGame(id: string): Promise<Game | undefined>;
   getGameWithPlayers(id: string): Promise<GameWithPlayers | undefined>;
@@ -34,13 +32,11 @@ export interface IStorage {
   joinGame(gameId: string, player2Id: string): Promise<void>;
   findWaitingOnlineGame(excludeUserId: string): Promise<Game | undefined>;
   
-  // Chat methods
   createChatMessage(message: InsertChatMessage & { userId: string }): Promise<ChatMessage>;
   getGameChatMessages(gameId: string): Promise<ChatMessageWithUser[]>;
 }
 
 export class DatabaseStorage implements IStorage {
-  // User methods
   async getUser(id: string): Promise<User | undefined> {
     const [user] = await db.select().from(users).where(eq(users.id, id));
     return user || undefined;
@@ -74,7 +70,6 @@ export class DatabaseStorage implements IStorage {
       .where(eq(users.id, id));
   }
 
-  // Game methods
   async createGame(game: Partial<InsertGame> & { player1Id: string }): Promise<Game> {
     const [newGame] = await db
       .insert(games)
@@ -188,7 +183,6 @@ export class DatabaseStorage implements IStorage {
     return game || undefined;
   }
 
-  // Chat methods
   async createChatMessage(message: InsertChatMessage & { userId: string }): Promise<ChatMessage> {
     const [newMessage] = await db
       .insert(chatMessages)

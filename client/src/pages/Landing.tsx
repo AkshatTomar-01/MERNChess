@@ -3,26 +3,16 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Sparkles, Users, BarChart3, Crown, Zap, Shield } from "lucide-react";
 import { motion } from "framer-motion";
-import heroImage from "@assets/generated_images/Premium_chess_board_hero_e54d0f06.png";
-
 export default function Landing() {
   return (
     <div className="min-h-screen bg-background">
-      {/* Hero Section */}
       <section className="relative min-h-screen flex items-center overflow-hidden">
-        {/* Background Image with Dark Wash */}
         <div className="absolute inset-0 z-0">
           <div className="absolute inset-0 bg-gradient-to-r from-background via-background/95 to-background/80 z-10" />
-          <img
-            src={heroImage}
-            alt="Premium chess board"
-            className="w-full h-full object-cover opacity-60"
-          />
         </div>
 
         <div className="container mx-auto px-6 relative z-20">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
-            {/* Left Content */}
             <motion.div
               initial={{ opacity: 0, x: -30 }}
               animate={{ opacity: 1, x: 0 }}
@@ -71,13 +61,11 @@ export default function Landing() {
               </div>
             </motion.div>
 
-            {/* Right side - reserved for image background */}
             <div className="hidden lg:block" />
           </div>
         </div>
       </section>
 
-      {/* Features Section */}
       <section className="py-24 bg-card">
         <div className="container mx-auto px-6">
           <div className="text-center mb-16">
@@ -146,7 +134,6 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* How It Works */}
       <section className="py-20">
         <div className="container mx-auto px-6">
           <div className="text-center mb-16">
@@ -155,7 +142,6 @@ export default function Landing() {
           </div>
 
           <div className="grid md:grid-cols-4 gap-8 relative">
-            {/* Connecting line */}
             <div className="hidden md:block absolute top-12 left-0 right-0 h-0.5 bg-border z-0" style={{ width: '75%', left: '12.5%' }} />
 
             {[
@@ -183,7 +169,6 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* CTA Section */}
       <section className="py-24 bg-card">
         <div className="container mx-auto px-6 text-center">
           <motion.div

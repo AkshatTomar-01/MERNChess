@@ -31,7 +31,6 @@ export default function Profile() {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Header */}
       <header className="border-b bg-card/50 backdrop-blur-lg sticky top-0 z-50">
         <div className="container mx-auto px-6 py-4">
           <Button
@@ -46,7 +45,6 @@ export default function Profile() {
       </header>
 
       <div className="container mx-auto px-6 py-12 max-w-4xl">
-        {/* Profile Header */}
         <Card className="mb-8">
           <CardContent className="p-8">
             {profileLoading ? (
@@ -87,7 +85,6 @@ export default function Profile() {
           </CardContent>
         </Card>
 
-        {/* Statistics Overview */}
         <div className="grid md:grid-cols-4 gap-6 mb-8">
           <Card>
             <CardHeader className="pb-3">
@@ -129,7 +126,6 @@ export default function Profile() {
           </Card>
         </div>
 
-        {/* Win Rate Progress */}
         <Card className="mb-8">
           <CardHeader>
             <CardTitle>Win Rate</CardTitle>
@@ -150,7 +146,6 @@ export default function Profile() {
           </CardContent>
         </Card>
 
-        {/* Game History */}
         <Card>
           <CardHeader>
             <CardTitle>Match History</CardTitle>

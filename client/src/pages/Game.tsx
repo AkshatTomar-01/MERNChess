@@ -13,7 +13,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { ArrowLeft, Crown } from "lucide-react";
+import { ArrowLeft, Crown, Users } from "lucide-react";
 import { getCurrentUserId, getCurrentUsername } from "@/lib/auth";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
@@ -129,7 +129,6 @@ export default function Game() {
       return await apiRequest("POST", "/api/game/move", moveData);
     },
     onSuccess: (data: { fen: string; pgn: string; aiMove?: { from: string; to: string } }) => {
-      // Update game state with authoritative server FEN
       const newGame = new Chess();
       newGame.loadPgn(data.pgn);
       setGame(newGame);
@@ -221,6 +220,12 @@ export default function Game() {
     return gameData.player1?.username || "Waiting...";
   };
 
+  useEffect(() => {
+    if (!currentGameId && mode === "online" && !createGameMutation.isPending) {
+      createGameMutation.mutate({ mode: "online" });
+    }
+  }, [mode, currentGameId, currentGameId]);
+
   if (showDifficultySelector) {
     return <DifficultySelector onSelect={handleDifficultySelect} onCancel={() => setLocation("/dashboard")} />;
   }
@@ -229,14 +234,6 @@ export default function Game() {
     return <GameCodeModal onSubmit={handleGameCodeSubmit} onCancel={() => setLocation("/dashboard")} />;
   }
 
-  // Auto-create online game when mode is online and no game exists
-  useEffect(() => {
-    if (!currentGameId && mode === "online" && !createGameMutation.isPending) {
-      createGameMutation.mutate({ mode: "online" });
-    }
-  }, [mode, currentGameId]);
-
-  // Show loading while creating/joining online game
   if (!currentGameId && mode === "online") {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
@@ -251,7 +248,6 @@ export default function Game() {
     );
   }
 
-  // Show waiting for opponent if game is in waiting status
   if (gameData?.status === "waiting" && (mode === "online" || mode === "friendly")) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
@@ -275,7 +271,6 @@ export default function Game() {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Header */}
       <header className="border-b bg-card/50 backdrop-blur-lg sticky top-0 z-50">
         <div className="container mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
@@ -298,14 +293,11 @@ export default function Game() {
 
       <div className="container mx-auto px-6 py-8">
         <div className="grid lg:grid-cols-[300px_1fr_320px] gap-6 items-start">
-          {/* Left Panel - Move History */}
           <div className="hidden lg:block">
             <MoveList game={game} />
           </div>
 
-          {/* Center - Chessboard */}
           <div className="space-y-6">
-            {/* Opponent Info */}
             <Card>
               <CardContent className="p-4">
                 <div className="flex items-center justify-between">
@@ -329,7 +321,6 @@ export default function Game() {
               </CardContent>
             </Card>
 
-            {/* Chessboard */}
             <div className="flex justify-center">
               <div className="w-full max-w-2xl">
                 <Chessboard
@@ -342,7 +333,6 @@ export default function Game() {
               </div>
             </div>
 
-            {/* Player Info */}
             <Card>
               <CardContent className="p-4">
                 <div className="flex items-center justify-between">
@@ -364,13 +354,11 @@ export default function Game() {
               </CardContent>
             </Card>
 
-            {/* Mobile Move List */}
             <div className="lg:hidden">
               <MoveList game={game} />
             </div>
           </div>
 
-          {/* Right Panel - Controls & Chat */}
           <div className="space-y-6">
             <GameControls
               gameStatus={gameData?.status || "active"}

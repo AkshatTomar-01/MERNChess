@@ -63,7 +63,6 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Header */}
       <header className="border-b bg-card/50 backdrop-blur-lg sticky top-0 z-50">
         <div className="container mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
@@ -96,7 +95,6 @@ export default function Dashboard() {
       </header>
 
       <div className="container mx-auto px-6 py-12">
-        {/* User Profile Section */}
         <div className="mb-12">
           {profileLoading ? (
             <div className="flex items-center gap-6">
@@ -123,7 +121,6 @@ export default function Dashboard() {
           )}
         </div>
 
-        {/* Stats Cards */}
         <div className="grid md:grid-cols-3 gap-6 mb-12">
           {profileLoading ? (
             <>
@@ -166,7 +163,6 @@ export default function Dashboard() {
           )}
         </div>
 
-        {/* Game Mode Selection */}
         <div className="mb-12">
           <h2 className="text-2xl font-bold mb-6">Start New Game</h2>
           <div className="grid md:grid-cols-3 gap-6">
@@ -211,7 +207,6 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* Recent Matches */}
         <div>
           <h2 className="text-2xl font-bold mb-6">Recent Matches</h2>
           <Card>

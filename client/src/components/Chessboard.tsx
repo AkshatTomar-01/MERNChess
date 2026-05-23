@@ -45,14 +45,12 @@ export default function Chessboard({
     if (disabled) return;
 
     if (selectedSquare) {
-      // Try to make a move
       const moves = game.moves({ square: selectedSquare, verbose: true });
       const move = moves.find((m) => m.to === square);
 
       if (move) {
-        // Check for pawn promotion
         if (move.flags.includes("p")) {
-          onMove(selectedSquare, square, "q"); // Auto-promote to queen
+          onMove(selectedSquare, square, "q");
         } else {
           onMove(selectedSquare, square);
         }
@@ -60,7 +58,6 @@ export default function Chessboard({
         setSelectedSquare(null);
         setLegalMoves([]);
       } else {
-        // Select new piece
         const piece = game.get(square);
         if (piece && piece.color === game.turn()) {
           setSelectedSquare(square);
@@ -72,7 +69,6 @@ export default function Chessboard({
         }
       }
     } else {
-      // Select a piece
       const piece = game.get(square);
       if (piece && piece.color === game.turn()) {
         setSelectedSquare(square);
@@ -128,7 +124,6 @@ export default function Chessboard({
                 whileTap={!disabled ? { scale: 0.95 } : {}}
                 data-testid={`square-${square}`}
               >
-                {/* Legal move indicator */}
                 {isHighlighted(square) && (
                   <motion.div
                     initial={{ scale: 0 }}
@@ -145,7 +140,6 @@ export default function Chessboard({
                   </motion.div>
                 )}
 
-                {/* Chess piece */}
                 <AnimatePresence mode="wait">
                   {piece && (
                     <motion.div
@@ -164,7 +158,6 @@ export default function Chessboard({
                   )}
                 </AnimatePresence>
 
-                {/* Coordinate labels */}
                 {fileIndex === 0 && (
                   <span className="absolute left-1 top-1 text-xs font-mono font-semibold opacity-60 pointer-events-none select-none">
                     {rank}
