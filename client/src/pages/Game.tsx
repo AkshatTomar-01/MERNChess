@@ -324,7 +324,11 @@ export default function Game() {
             <Button
               size="lg"
               className="w-full"
-              onClick={() => setLocation("/dashboard")}
+              onClick={() => {
+                queryClient.invalidateQueries({ queryKey: ["/api/game/recent"] });
+                queryClient.invalidateQueries({ queryKey: ["/api/auth/profile"] });
+                setLocation("/dashboard");
+              }}
             >
               Continue
             </Button>
