@@ -440,6 +440,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
             });
           }
         }
+
+        if (message.type === "gameOver" && currentGameId) {
+          const connections = gameConnections.get(currentGameId);
+          if (connections) {
+            connections.forEach((clientWs) => {
+              if (clientWs !== ws && clientWs.readyState === WebSocket.OPEN) {
+                clientWs.send(JSON.stringify({ type: "gameOver" }));
+              }
+            });
+          }
+        }
       } catch (error) {
         console.error("WebSocket error:", error);
       }

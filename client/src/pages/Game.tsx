@@ -13,7 +13,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { ArrowLeft, Crown, Users } from "lucide-react";
+import { ArrowLeft, Crown, Users, Trophy, Frown, Handshake } from "lucide-react";
 import { getCurrentUserId, getCurrentUsername } from "@/lib/auth";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
@@ -87,10 +87,6 @@ export default function Game() {
         } else if (data.type === "chat") {
           queryClient.invalidateQueries({ queryKey: [`/api/game/chat/${currentGameId}`] });
         } else if (data.type === "gameOver") {
-          toast({
-            title: "Game Over",
-            description: data.result === "draw" ? "The game ended in a draw" : `${data.winner} wins!`,
-          });
           queryClient.invalidateQueries({ queryKey: ["/api/game", currentGameId] });
         } else if (data.type === "playerJoined") {
           queryClient.invalidateQueries({ queryKey: ["/api/game", currentGameId] });
@@ -196,10 +192,10 @@ export default function Game() {
     if (!currentGameId) return;
     try {
       await apiRequest("POST", "/api/game/resign", { gameId: currentGameId });
-      toast({
-        title: "Game resigned",
-        description: "You have resigned from the game.",
-      });
+      wsRef.current?.send(JSON.stringify({
+        type: "gameOver",
+        gameId: currentGameId,
+      }));
       queryClient.invalidateQueries({ queryKey: ["/api/game", currentGameId] });
     } catch (error: any) {
       toast({
@@ -300,7 +296,43 @@ export default function Game() {
 
   return (
     <div className="min-h-screen bg-background">
-      <header className="border-b bg-card/50 backdrop-blur-lg sticky top-0 z-50">
+      {gameData?.status === "finished" && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm">
+          <div className="bg-card border rounded-2xl p-10 text-center max-w-sm w-full mx-4 shadow-2xl">
+            {gameData.result === "draw" ? (
+              <>
+                <Handshake className="w-20 h-20 mx-auto mb-4 text-chart-3" />
+                <h2 className="text-3xl font-bold mb-2">It's a Draw!</h2>
+                <p className="text-muted-foreground mb-8">A well-fought game by both sides.</p>
+              </>
+            ) : gameData.winnerId === currentUserId ? (
+              <>
+                <div className="relative mb-4">
+                  <Trophy className="w-20 h-20 mx-auto text-yellow-400" />
+                  <div className="absolute inset-0 blur-xl bg-yellow-400/30 rounded-full" />
+                </div>
+                <h2 className="text-3xl font-bold mb-2 text-yellow-400">Victory!</h2>
+                <p className="text-muted-foreground mb-8">Congratulations, you won the game!</p>
+              </>
+            ) : (
+              <>
+                <Frown className="w-20 h-20 mx-auto mb-4 text-destructive" />
+                <h2 className="text-3xl font-bold mb-2 text-destructive">Defeated</h2>
+                <p className="text-muted-foreground mb-8">Better luck next time!</p>
+              </>
+            )}
+            <Button
+              size="lg"
+              className="w-full"
+              onClick={() => setLocation("/dashboard")}
+            >
+              Continue
+            </Button>
+          </div>
+        </div>
+      )}
+
+      <header className="border-b bg-card/50 backdrop-blur-lg sticky top-0 z-40">
         <div className="container mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
             <Button
