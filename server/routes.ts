@@ -414,6 +414,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
             gameConnections.set(currentGameId, new Set());
           }
           gameConnections.get(currentGameId)!.add(ws);
+
+          const connections = gameConnections.get(currentGameId);
+          if (connections && connections.size > 1) {
+            connections.forEach((clientWs) => {
+              if (clientWs.readyState === WebSocket.OPEN) {
+                clientWs.send(JSON.stringify({ type: "playerJoined", gameId: currentGameId }));
+              }
+            });
+          }
         }
 
         if (message.type === "move" && currentGameId) {

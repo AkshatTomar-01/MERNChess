@@ -43,8 +43,8 @@ export default function Game() {
   const { data: gameData, isLoading: gameLoading } = useQuery<GameWithPlayers>({
     queryKey: ["/api/game", currentGameId],
     enabled: !!currentGameId,
-    refetchInterval: (data) => {
-      if (data?.status === "waiting") return 2000;
+    refetchInterval: (query) => {
+      if (query.state.data?.status === "waiting") return 2000;
       return false;
     },
   });
@@ -90,6 +90,8 @@ export default function Game() {
             title: "Game Over",
             description: data.result === "draw" ? "The game ended in a draw" : `${data.winner} wins!`,
           });
+          queryClient.invalidateQueries({ queryKey: ["/api/game", currentGameId] });
+        } else if (data.type === "playerJoined") {
           queryClient.invalidateQueries({ queryKey: ["/api/game", currentGameId] });
         }
       };
