@@ -415,6 +415,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
           }
           gameConnections.get(currentGameId)!.add(ws);
         }
+
+        if (message.type === "move" && currentGameId) {
           const connections = gameConnections.get(currentGameId);
           if (connections) {
             connections.forEach((clientWs) => {
